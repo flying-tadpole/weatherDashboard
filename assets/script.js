@@ -21,7 +21,7 @@ function getData() {
                 console.log('lat', latitude)
                 var longitude = dataArray[0].lon
                 console.log('lon', longitude)
-                var requestUrl = `http://api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longitude}&appid=48b446f840f21fe274c2224a206ddfc4`
+                var requestUrl = `http://api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longitude}&appid=48b446f840f21fe274c2224a206ddfc4&units=imperial`
                     fetch(requestUrl)
                         .then(function (response){
                             console.log('weather response', response)
@@ -29,7 +29,10 @@ function getData() {
                         }) 
                         .then (function (data){
                             console.log('weather data', data)
+                            var weatherData = data
+                            
                         })
 })}
+
 
 fetchButton.addEventListener('click', getData)
