@@ -1,94 +1,78 @@
-var cityInput = document.getElementById('cityName')
-var stateInput = document.getElementById('stateName')
-var cityName = cityInput.value
-var stateName = stateInput.value
+window.addEventListener("load", function(event){
+    console.log('window is loaded')
+    var cityInput = document.getElementById('cityName')
+    var stateInput = document.getElementById('stateName')
+    var cityName = cityInput.value
+    var stateName = stateInput.value
 
-var fetchButton = document.getElementById('fetch-data')
-var displayedData = document.getElementById('fetchedData')
-var resetButton = document.getElementById('resetPage')
+    var fetchButton = document.getElementById('fetch-data')
+    var displayedData = document.getElementById('fetchedData')
+    var resetButton = document.getElementById('resetPage')
 
-function getData() {
-    var geoRequestUrl = `https://geocode.maps.co/search?city=${cityName}&state=${stateName}`
-    fetch(geoRequestUrl)
-        .then(function (response) {
-            console.log('geo response', response)
-            return response.json()
-        })
-        .then(function (data) {
-            console.log('geo data', data)
-                var dataArray = Array.from(data)
-                var latitude = dataArray[0].lat
-                console.log('lat', latitude)
-                var longitude = dataArray[0].lon
-                console.log('lon', longitude)
-                var requestUrl = `http://api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longitude}&appid=48b446f840f21fe274c2224a206ddfc4&units=imperial`
-                    fetch(requestUrl)
-                        .then(function (response){
-                            console.log('weather response', response)
-                            return response.json()
-                        }) 
-                        .then (function (data){
-                            console.log('weather data', data)
-                            var weatherData = data
+    function getData() {
+        displayedData.textContent = ''
+        var geoRequestUrl = `https://geocode.maps.co/search?city=${cityName}&state=${stateName}`
+        fetch(geoRequestUrl)
+            .then(function (response) {
+                console.log('geo response', response)
+                return response.json()
+            })
+            .then(function (data) {
+                console.log('geo data', data)
+                    var dataArray = Array.from(data)
+                    var latitude = dataArray[0].lat
+                    console.log('lat', latitude)
+                    var longitude = dataArray[0].lon
+                    console.log('lon', longitude)
+                    var requestUrl = `http://api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longitude}&appid=48b446f840f21fe274c2224a206ddfc4&units=imperial`
+                        fetch(requestUrl)
+                            .then(function (response){
+                                console.log('weather response', response)
+                                return response.json()
+                            }) 
+                            .then (function (data){
+                                console.log('weather data', data)
+                                var weatherData = data
 
-                            var weatherForcast = document.createElement('div')
-                            var dayOne = document.createElement('card')
-                            var dayTwo = document.createElement('card')
-                            var dayThree = document.createElement('card')
-                            var dayFour = document.createElement('card')
-                            var dayFive = document.createElement('card')
-                            var day1Date = document.createElement('h3')
-                            var day2Date = document.createElement('h3')
-                            var day3Date = document.createElement('h3')
-                            var day4Date = document.createElement('h3')
-                            var day5Date = document.createElement('h3')
-                            var day1MaxTemp = document.createElement('p')
-                            var day2MaxTemp = document.createElement('p')
-                            var day3MaxTemp = document.createElement('p')
-                            var day4MaxTemp = document.createElement('p')
-                            var day5MaxTemp = document.createElement('p')
-                            var day1Humidity = document.createElement('p')
-                            var day2Humidity = document.createElement('p')
-                            var day3Humidity = document.createElement('p')
-                            var day4Humidity = document.createElement('p')
-                            var day5Humidity = document.createElement('p')
-                            var day1Wind = document.createElement('p')
-                            var day2Wind = document.createElement('p')
-                            var day3Wind = document.createElement('p')
-                            var day4Wind = document.createElement('p')
-                            var day5Wind = document.createElement('p')
+                                var mulDayForecast = [weatherData.list[4], weatherData.list[12], weatherData.list[20], weatherData.list[28], weatherData.list[36]]
+                                console.log('forecast array?', mulDayForecast)
 
-                            day1Date.textContent = weatherData.list[4].main.temp_max
-                            day1MaxTemp.textContent = `High Of: ${weatherData.list[4].main.temp_max}`
-                            day1Humidity.textContent = `Humidity: ${weatherData.list[4].main.humidity}`
-                            day1Wind.textContent = `Wind Speed: ${weatherData.list[4].wind.speed}`
+                                for (var i = 0; i < mulDayForecast.length; i++) {
+                                    var dayCard = document.createElement('card')
+                                    var dayDateEl = document.createElement('h3')
+                                    var dayTemp = document.createElement('p')
+                                    var dayHumidity = document.createElement('p')
+                                    var dayWind = document.createElement('p')
 
-                            day2MaxTemp.textContent = `High Of: ${weatherData.list[12].main.temp_max}`
-                            day2Humidity.textContent = `Humidity: ${weatherData.list[12].main.humidity}`
-                            day2Wind.textContent = `Wind Speed: ${weatherData.list[12].wind.speed}`
+                                    dayCard.setAttribute('class', 'card  col-12 col-md-6 col-lg-3')
+                                    dayDateEl.setAttribute('class', 'card-title')
+                                    dayTemp.setAttribute('class', 'card-text')
+                                    dayHumidity.setAttribute('class', 'card-text')
+                                    dayWind.setAttribute('class', 'card-text')
 
-                            day3MaxTemp.textContent = `High Of: ${weatherData.list[20].main.temp_max}`
-                            day3Humidity.textContent = `Humidity: ${weatherData.list[20].main.humidity}`
-                            day3Wind.textContent = `Wind Speed: ${weatherData.list[20].wind.speed}`
+                                    var unconvertDate = mulDayForecast[i].dt
+                                    var dayDate = convertTimestamp(unconvertDate)
+                                    
+                                    dayDateEl.textContent = `Date: ${dayDate}`
+                                    dayTemp.textContent = `High Of: ${mulDayForecast[i].main.temp_max}`
+                                    dayHumidity.textContent = `Humidity: ${mulDayForecast[i].main.humidity}`
+                                    dayWind.textContent = `Wind Speed: ${mulDayForecast[i].wind.speed}`
 
-                            day4MaxTemp.textContent = `High Of: ${weatherData.list[28].main.temp_max}`
-                            day4Humidity.textContent = `Humidity: ${weatherData.list[28].main.humidity}`
-                            day4Wind.textContent = `Wind Speed: ${weatherData.list[28].wind.speed}`
+                                    dayCard.append(dayDateEl, dayTemp, dayHumidity, dayWind)
+                                    displayedData.append(dayCard)
+                                }
+                            })
+    })}
 
-                            day5MaxTemp.textContent = `High Of: ${weatherData.list[36].main.temp_max}`
-                            day5Humidity.textContent = `Humidity: ${weatherData.list[36].main.humidity}`
-                            day5Wind.textContent = `Wind Speed: ${weatherData.list[36].wind.speed}`
+    function convertTimestamp(timestamp) {
+        var d = new Date(timestamp * 1000), // Convert the passed timestamp to milliseconds
+            yyyy = d.getFullYear(),
+            mm = ('0' + (d.getMonth() + 1)).slice(-2),  // Months are zero based. Add leading 0.
+            dd = ('0' + d.getDate()).slice(-2),         // Add leading 0.
 
-                            dayOne.append(day1MaxTemp, day1Humidity, day1Wind)
-                            dayTwo.append(day2MaxTemp, day2Humidity, day2Wind)
-                            dayThree.append(day3MaxTemp, day3Humidity, day3Wind)
-                            dayFour.append(day4MaxTemp, day4Humidity, day4Wind)
-                            dayFive.append(day5MaxTemp, day5Humidity, day5Wind)
-                            weatherForcast.append(dayOne, dayTwo, dayThree, dayFour, dayFive)
-                            displayedData.append(weatherForcast)
-                            
-                        })
-})}
+        convertedDate = mm + '-' + dd  + '-' + yyyy
+        return convertedDate;
+    }
 
-
-fetchButton.addEventListener('click', getData)
+    fetchButton.addEventListener('click', getData)
+})
