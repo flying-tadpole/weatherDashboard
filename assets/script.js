@@ -6,6 +6,7 @@ window.addEventListener("load", function(event){
     var resetButton = document.getElementById('resetPage')
 
     function getData() {
+        // saveSearch(cityInput, stateInput)
         displayedData.textContent = ''
         var cityInput = document.getElementById('cityName')
         var stateInput = document.getElementById('stateName')
@@ -26,16 +27,6 @@ window.addEventListener("load", function(event){
                     console.log('lon', longitude)
                     var requestUrlToday = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=48b446f840f21fe274c2224a206ddfc4&units=imperial`
                     var requestUrlMulDay = `http://api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longitude}&appid=48b446f840f21fe274c2224a206ddfc4&units=imperial`
-                        fetch(requestUrlMulDay)
-                            .then(function (response){
-                                console.log('weather response', response)
-                                return response.json()
-                            }) 
-                            .then (function (data){
-                                console.log('mul day weather data', data)
-                                var mulDayForecast = data
-                                createForecast(mulDayForecast)
-                            })
                         fetch(requestUrlToday)
                             .then(function (response){
                                 console.log('today weather response', response)
@@ -46,9 +37,53 @@ window.addEventListener("load", function(event){
                                 var todayForecast = data
                                 createTodayForecast(todayForecast)
                             })
+                        fetch(requestUrlMulDay)
+                            .then(function (response){
+                                console.log('weather response', response)
+                                return response.json()
+                            }) 
+                            .then (function (data){
+                                console.log('mul day weather data', data)
+                                var mulDayForecast = data
+                                createForecast(mulDayForecast)
+                            })
+                        
         cityInput.value = ""
         stateInput.value = ""
     })}
+
+    function createTodayForecast(todayForecast) {
+        console.log('running createtodayforecast')
+        
+        var todayCard = document.createElement('card')
+        var dayDateEl = document.createElement('h3')
+        var weatherIcon = document.createElement('img')
+        var dayTemp = document.createElement('p')
+        var dayHumidity = document.createElement('p')
+        var dayWind = document.createElement('p')
+
+        console.log('single day icon code', todayForecast.weather[0].icon)
+        var iconCode = todayForecast.weather[0].icon
+
+        var unconvertDate = todayForecast.dt
+        var dayDate = convertTimestamptoDate(unconvertDate)
+        
+        todayCard.setAttribute('class', 'card  col-6 col-md-3 col-lg-2 border-dark m-1')
+        dayDateEl.setAttribute('class', 'card-title text-nowrap')
+        dayTemp.setAttribute('class', 'card-text')
+        dayHumidity.setAttribute('class', 'card-text')
+        dayWind.setAttribute('class', 'card-text')
+        weatherIcon.src = `http://openweathermap.org/img/w/${iconCode}.png`
+        weatherIcon.setAttribute('class', 'card-img-top')
+
+        dayDateEl.textContent = `${dayDate}`
+        dayTemp.textContent = `Temp: ${todayForecast.main.temp}`
+        dayHumidity.textContent = `Humidity: ${todayForecast.main.humidity}%`
+        dayWind.textContent = `Wind Speed: ${todayForecast.wind.speed}`
+
+        todayCard.append(weatherIcon, dayDateEl, dayTemp, dayHumidity, dayWind)
+        displayedData.append(todayCard)
+    }
 
     function createForecast(mulDayForecast) {
         console.log('running createForecast with this data:', mulDayForecast)
@@ -65,19 +100,20 @@ window.addEventListener("load", function(event){
                 var dayHumidity = document.createElement('p')
                 var dayWind = document.createElement('p')
 
-                console.log('icon code', mulDayForecast.list[i].weather[0].icon)
+                console.log('mul day icon code', mulDayForecast.list[i].weather[0].icon)
                 var iconCode = mulDayForecast.list[i].weather[0].icon
 
-                dayCard.setAttribute('class', 'card  col-12 col-md-6 col-lg-3')
-                dayDateEl.setAttribute('class', 'card-title')
+                dayCard.setAttribute('class', 'card  col-6 col-md-3 col-lg-2 border-dark m-1')
+                dayDateEl.setAttribute('class', 'card-title text-nowrap')
                 dayTemp.setAttribute('class', 'card-text')
                 dayHumidity.setAttribute('class', 'card-text')
                 dayWind.setAttribute('class', 'card-text')
                 weatherIcon.src = `http://openweathermap.org/img/w/${iconCode}.png`
+                weatherIcon.setAttribute('class', 'card-img-top')
 
-                dayDateEl.textContent = `Date: ${dayDate}`
-                dayTemp.textContent = `High Of: ${mulDayForecast.list[i].main.temp_max}`
-                dayHumidity.textContent = `Humidity: ${mulDayForecast.list[i].main.humidity}`
+                dayDateEl.textContent = `${dayDate}`
+                dayTemp.textContent = `Temp: ${mulDayForecast.list[i].main.temp_max}`
+                dayHumidity.textContent = `Humidity: ${mulDayForecast.list[i].main.humidity}%`
                 dayWind.textContent = `Wind Speed: ${mulDayForecast.list[i].wind.speed}`
 
                 dayCard.append(weatherIcon, dayDateEl, dayTemp, dayHumidity, dayWind)
@@ -85,49 +121,6 @@ window.addEventListener("load", function(event){
             }     
         }
     }
-
-    function createTodayForecast(todayForecast) {
-        console.log('running createtodayforecast')
-        
-        var todayCard = document.createElement('card')
-        var dayDateEl = document.createElement('h3')
-        var weatherIcon = document.createElement('p')
-        var dayTemp = document.createElement('p')
-        var dayHumidity = document.createElement('p')
-        var dayWind = document.createElement('p')
-
-        // getWeatherIcon(weatherIcon)
-
-        var unconvertDate = todayForecast.dt
-        var dayDate = convertTimestamptoDate(unconvertDate)
-        
-        todayCard.setAttribute('class', 'card  col-12 col-md-6 col-lg-3')
-        dayDateEl.setAttribute('class', 'card-title')
-        dayTemp.setAttribute('class', 'card-text')
-        dayHumidity.setAttribute('class', 'card-text')
-        dayWind.setAttribute('class', 'card-text')
-
-        dayDateEl.textContent = `Date: ${dayDate}`
-        dayTemp.textContent = `High Of: ${todayForecast.main.temp}`
-        dayHumidity.textContent = `Humidity: ${todayForecast.main.humidity}`
-        dayWind.textContent = `Wind Speed: ${todayForecast.wind.speed}`
-
-        todayCard.append(dayDateEl, dayTemp, dayHumidity, dayWind)
-        displayedData.append(todayCard)
-    }
-
-    // function getWeatherIcon(weatherIcon) {
-    //     var weatherIcon = document.createElement('p')
-    //     if (mulDayForecast.list[i].weather[0].main.icon == "Clouds") {
-    //         weatherIcon.textContent = ''
-    //     } else if (mulDayForecast.list[i].weather[0].main == "Clear") {
-    //         weatherIcon.textContent = ''
-    //     } else if (mulDayForecast.list[i].weather[0].main == "") {
-    //         weatherIcon.textContent = ''
-    //     } else if (mulDayForecast.list[i].weather[0].main == "") {
-    //         weatherIcon.textContent = ''
-    //     }
-    // }
 
     function convertTimestamptoDate(timestamp) {
         var d = new Date(timestamp * 1000), // Convert the passed timestamp to milliseconds
@@ -158,6 +151,16 @@ window.addEventListener("load", function(event){
         convertedTime = h + ':' + min + ' ' + ampm
         return convertedTime;
     }
+
+    // function saveSearch(cityInput, stateInput) {
+    //     console.log('saving search terms')
+    //     var savedSearchTerms = cityInput + ', ' + stateInput
+    //     localStorage.setItem(item, savedSearchTerms)
+    //     var savedSearchItems = document.getElementById('savedSearchList')
+    //     var savedItem = document.createElement('p')
+    //     savedItem.textContent = savedSearchTerms
+    //     savedSearchItems.append(savedItem)
+    // }
 
     fetchButton.addEventListener('click', getData)
 })

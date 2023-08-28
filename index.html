@@ -8,7 +8,7 @@
 </head>
 <body class="container my-5">
     <section class="row">
-        <div class="col-12 col-md-4 col-lg-3">
+        <div class="col col-12 col-md-4 col-lg-3">
             <h2>Select Location for Weather Report</h2>
             <label for="cityName">City</label>
             <input type="text" id="cityName"/>
@@ -68,7 +68,9 @@
             </select>
             <button id="fetch-data">Click Me</button>
         </div>
-        <main class="col-12 col-md-8 col-lg-9" id="fetchedData"></main>
+        <main class="col" >
+            <section class="row" id="fetchedData"></section>
+        </main>
     </section>  
     <script src="./assets/script.js"></script>
 </body>
