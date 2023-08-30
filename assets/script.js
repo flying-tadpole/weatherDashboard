@@ -1,10 +1,12 @@
+// waits until all elements are loaded before running code
 window.addEventListener("load", function(event){
     console.log('window is loaded')
 
+    // identifies elements on page
     var fetchButton = document.getElementById('fetch-data')
     var displayedData = document.getElementById('fetchedData')
-    var resetButton = document.getElementById('resetPage')
 
+    // takes user input and runs API query to get weather data
     function getData() {
         displayedData.textContent = ''
         var cityInput = document.getElementById('cityName')
@@ -12,7 +14,7 @@ window.addEventListener("load", function(event){
         var cityName = cityInput.value
         var stateName = stateInput.value
         saveSearch(cityName, stateName)
-        var geoRequestUrl = `https://geocode.maps.co/search?city=${cityName}&state=${stateName}`
+        var geoRequestUrl = `https://geocode.maps.co/search?city=${cityName}&state=${stateName}` //used to get lat/lon info
         fetch(geoRequestUrl)
             .then(function (response) {
                 console.log('geo response', response)
@@ -25,7 +27,9 @@ window.addEventListener("load", function(event){
                     console.log('lat', latitude)
                     var longitude = dataArray[0].lon
                     console.log('lon', longitude)
+                    // used to get TODAY forecast
                     var requestUrlToday = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=48b446f840f21fe274c2224a206ddfc4&units=imperial`
+                    // used to get next 5 days forecast
                     var requestUrlMulDay = `http://api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longitude}&appid=48b446f840f21fe274c2224a206ddfc4&units=imperial`
                         fetch(requestUrlToday)
                             .then(function (response){
@@ -35,7 +39,7 @@ window.addEventListener("load", function(event){
                             .then (function (data){
                                 console.log('today weather data', data)
                                 var todayForecast = data
-                                createTodayForecast(todayForecast)
+                                createTodayForecast(todayForecast) //sends data for today forecast
                             })
                         fetch(requestUrlMulDay)
                             .then(function (response){
@@ -45,13 +49,14 @@ window.addEventListener("load", function(event){
                             .then (function (data){
                                 console.log('mul day weather data', data)
                                 var mulDayForecast = data
-                                createForecast(mulDayForecast)
+                                createForecast(mulDayForecast) //sends data for next 5 days forecast
                             })
-                        
+        // clears out search fields 
         cityInput.value = ""
         stateInput.value = ""
     })}
 
+    // takes data from API and appends forecast to page for today
     function createTodayForecast(todayForecast) {
         console.log('running createtodayforecast')
         
@@ -85,6 +90,7 @@ window.addEventListener("load", function(event){
         displayedData.append(todayCard)
     }
 
+    // takes data from API and appends forecast to page for next 5 days
     function createForecast(mulDayForecast) {
         console.log('running createForecast with this data:', mulDayForecast)
         for (var i = 0; i < mulDayForecast.list.length; i++) {
@@ -92,6 +98,7 @@ window.addEventListener("load", function(event){
             var dayDate = convertTimestamptoDate(unconvertDate)
             var dayTime = convertTimestamptoTime(unconvertDate)
             
+            // because API gives data in 3 hours sections, 10am is used to get only one data point per day
             if (dayTime === '10:00 AM') {
                 var dayCard = document.createElement('card')
                 var dayDateEl = document.createElement('h3')
@@ -122,6 +129,7 @@ window.addEventListener("load", function(event){
         }
     }
 
+    // used to convert date data to human readible format
     function convertTimestamptoDate(timestamp) {
         var d = new Date(timestamp * 1000), // Convert the passed timestamp to milliseconds
             yyyy = d.getFullYear(),
@@ -132,6 +140,7 @@ window.addEventListener("load", function(event){
         return convertedDate;
     }
 
+    // used to convert time data to human readible format
     function convertTimestamptoTime(timestamp) {
         var d = new Date(timestamp * 1000), // Convert the passed timestamp to milliseconds
             hh = d.getHours(),
@@ -152,15 +161,19 @@ window.addEventListener("load", function(event){
         return convertedTime;
     }
 
+    //saves search terms in local storage
     function saveSearch(cityName, stateName) {
         console.log('saving search terms')
         var savedSearchTerms = cityName + ', ' + stateName
         localStorage.setItem("savedSearchTerms", savedSearchTerms)
         var savedSearchItems = document.getElementById('savedSearchList')
         var savedItem = document.createElement('p')
+        var savedItemButton = document.createElement('button')
         savedItem.textContent = savedSearchTerms
-        savedSearchItems.append(savedItem)
+        savedItemButton.append(savedItem)
+        savedSearchItems.append(savedItemButton)
     }
 
+    //runs on button click
     fetchButton.addEventListener('click', getData)
 })
