@@ -6,12 +6,12 @@ window.addEventListener("load", function(event){
     var resetButton = document.getElementById('resetPage')
 
     function getData() {
-        // saveSearch(cityInput, stateInput)
         displayedData.textContent = ''
         var cityInput = document.getElementById('cityName')
         var stateInput = document.getElementById('stateName')
         var cityName = cityInput.value
         var stateName = stateInput.value
+        saveSearch(cityName, stateName)
         var geoRequestUrl = `https://geocode.maps.co/search?city=${cityName}&state=${stateName}`
         fetch(geoRequestUrl)
             .then(function (response) {
@@ -152,15 +152,15 @@ window.addEventListener("load", function(event){
         return convertedTime;
     }
 
-    // function saveSearch(cityInput, stateInput) {
-    //     console.log('saving search terms')
-    //     var savedSearchTerms = cityInput + ', ' + stateInput
-    //     localStorage.setItem(item, savedSearchTerms)
-    //     var savedSearchItems = document.getElementById('savedSearchList')
-    //     var savedItem = document.createElement('p')
-    //     savedItem.textContent = savedSearchTerms
-    //     savedSearchItems.append(savedItem)
-    // }
+    function saveSearch(cityName, stateName) {
+        console.log('saving search terms')
+        var savedSearchTerms = cityName + ', ' + stateName
+        localStorage.setItem("savedSearchTerms", savedSearchTerms)
+        var savedSearchItems = document.getElementById('savedSearchList')
+        var savedItem = document.createElement('p')
+        savedItem.textContent = savedSearchTerms
+        savedSearchItems.append(savedItem)
+    }
 
     fetchButton.addEventListener('click', getData)
 })
